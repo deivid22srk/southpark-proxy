@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>South Park Hub - Proxy & Streaming Portal</title>
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-south">SOUTH</span>
+          <span class="logo-park">PARK</span>
+          <span class="logo-badge">PROXY</span>
+        </div>
+        <p class="sidebar-subtitle">Temporadas & Episódios</p>
+      </div>
+      
+      <div class="seasons-nav-container">
+        <div class="seasons-loading">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+          <span>Carregando temporadas...</span>
+        </div>
+        <ul id="seasons-list" class="seasons-list hidden">
+          <!-- Dynamic Seasons List -->
+        </ul>
+      </div>
+      
+      <div class="sidebar-footer">
+        <div class="status-indicator">
+          <span class="status-dot online"></span>
+          <span id="proxy-status-text">Proxy: Online</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Navbar -->
+      <nav class="navbar">
+        <button id="toggle-sidebar-btn" class="nav-btn" title="Alternar Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        
+        <div class="search-bar-container">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" placeholder="Pesquisar episódios nesta temporada...">
+        </div>
+        
+        <div class="navbar-actions">
+          <a href="/proxy/seasons/south-park" target="_blank" class="nav-action-btn secondary-btn" title="Ir para o Site Original (Proxy)">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <span>Navegar no Site Original</span>
+          </a>
+          <button id="test-proxy-btn" class="nav-action-btn primary-btn" title="Testar Conexão do Proxy">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Testar Proxy</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Content Container -->
+      <div class="content-body">
+        
+        <!-- Welcome Hero View (Shown on Initial Load) -->
+        <section id="welcome-view" class="view-section">
+          <div class="hero-banner">
+            <div class="hero-content">
+              <span class="hero-tag">SISTEMA PROXY ATIVO</span>
+              <h1>Bem-vindo ao South Park Hub!</h1>
+              <p>Assista a todas as temporadas do desenho animado mais polêmico do mundo através do nosso proxy transparente de alta velocidade. Escolha uma temporada no menu lateral para começar.</p>
+              <div class="hero-stats">
+                <div class="stat-item">
+                  <span class="stat-number">28</span>
+                  <span class="stat-label">Temporadas</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">320+</span>
+                  <span class="stat-label">Episódios</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-number">100%</span>
+                  <span class="stat-label">Gratuito</span>
+                </div>
+              </div>
+            </div>
+            <div class="hero-image-overlay"></div>
+          </div>
+          
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+              <h3>Proxy Transparente</h3>
+              <p>Nossa tecnologia faz cache e otimiza as requisições diretas ao site original, reduzindo o tempo de carregamento.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fa-solid fa-photo-film"></i></div>
+              <h3>Player Integrado</h3>
+              <p>Assista os episódios originais direto do portal, sem anúncios invasivos de terceiros e sem bloqueio geográfico.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon"><i class="fa-solid fa-server"></i></div>
+              <h3>Bypass de Restrições</h3>
+              <p>O proxy remove cabeçalhos que impedem a incorporação (como SameOrigin e CSP) para uma visualização suave.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Episodes Grid View -->
+        <section id="episodes-view" class="view-section hidden">
+          <div class="section-header">
+            <div class="section-title-wrapper">
+              <h2 id="current-season-title">Temporada 1</h2>
+              <span id="episodes-count" class="badge">0 Episódios</span>
+            </div>
+            <button id="back-to-home-btn" class="text-btn">
+              <i class="fa-solid fa-arrow-left"></i> Voltar ao Início
+            </button>
+          </div>
+
+          <div class="episodes-loading">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <span>Buscando episódios através do Proxy...</span>
+          </div>
+
+          <div id="episodes-grid" class="episodes-grid hidden">
+            <!-- Dynamic Episode Cards -->
+          </div>
+        </section>
+
+        <!-- Video Player View -->
+        <section id="player-view" class="view-section hidden">
+          <div class="player-header">
+            <button id="back-to-episodes-btn" class="back-btn">
+              <i class="fa-solid fa-arrow-left"></i>
+              <span>Voltar para Episódios</span>
+            </button>
+            <div class="player-title-info">
+              <span id="player-episode-meta" class="episode-meta">T1 • E1</span>
+              <h2 id="player-episode-title" class="episode-title">Cartman Gets An Anal Probe</h2>
+            </div>
+          </div>
+
+          <div class="player-container">
+            <div class="player-iframe-wrapper">
+              <!-- Responsive 16:9 Iframe -->
+              <iframe 
+                id="video-player-iframe" 
+                src="" 
+                allow="autoplay; encrypted-media; picture-in-picture" 
+                allowfullscreen
+                sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
+              ></iframe>
+            </div>
+          </div>
+
+          <div class="episode-details-card">
+            <h3>Sinopse</h3>
+            <p id="player-episode-desc" class="episode-desc">Carregando detalhes...</p>
+            <div class="proxy-note">
+              <i class="fa-solid fa-info-circle"></i>
+              <span>Este episódio está sendo carregado de forma segura através do proxy local. Se o player mostrar tela preta ou erro de região, certifique-se de que o proxy está em funcionamento.</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast hidden">
+    <i class="fa-solid fa-info-circle toast-icon"></i>
+    <span id="toast-message">Mensagem do Toast</span>
+  </div>
+
+  <!-- Custom JS -->
+  <script src="app.js"></script>
+</body>
+</html>

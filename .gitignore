@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Temp data & scraped dumps
+temp.html
+raw.html
+raw_ep1.html
+seasons.json
+episode.json
+player_props.json
+
+# Scratch scripts
+extract.js
+extract_episode.js
+analyze_seasons.js
+print_tree.js
+get_player_props.js
+check_load_more.js
+test_season2.js
+test_all_episodes.js
+search_raw.js
+
+# Logs
+logs/
+*.log
