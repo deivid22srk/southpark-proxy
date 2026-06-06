@@ -221,9 +221,24 @@ async function handleProxy(req, res, targetHost, urlPrefixToRemove) {
         const interceptorScript = `
 <script>
   (function() {
+    // AdBlocker: Check if a URL belongs to known ad networks and block it
+    function isAdServer(urlStr) {
+      if (!urlStr) return false;
+      return urlStr.includes('doubleclick.net') || 
+             urlStr.includes('freewheel.tv') || 
+             urlStr.includes('googlesyndication.com') ||
+             urlStr.includes('2mdn.net') ||
+             urlStr.includes('ad.doubleclick.net') ||
+             urlStr.includes('pubads.g.doubleclick.net');
+    }
+
     const originalFetch = window.fetch;
     window.fetch = function(url, options) {
       if (typeof url === 'string') {
+        if (isAdServer(url)) {
+          console.log('[Proxy AdBlocker] Blocked fetch to:', url);
+          return Promise.resolve(new Response('', { status: 200, statusText: 'OK' }));
+        }
         if (url.includes('topaz.paramount.tech')) {
           url = url.replace(/https?:\\/\\/topaz\\.paramount\\.tech/g, window.location.origin + '/proxy-topaz');
         } else if (url.includes('api.neutron.paramount.tech')) {
@@ -231,6 +246,10 @@ async function handleProxy(req, res, targetHost, urlPrefixToRemove) {
         }
       } else if (url && typeof url === 'object' && url.href) {
         let href = url.href;
+        if (isAdServer(href)) {
+          console.log('[Proxy AdBlocker] Blocked fetch to:', href);
+          return Promise.resolve(new Response('', { status: 200, statusText: 'OK' }));
+        }
         if (href.includes('topaz.paramount.tech')) {
           url = new URL(href.replace(/https?:\\/\\/topaz\\.paramount\\.tech/g, window.location.origin + '/proxy-topaz'));
         } else if (href.includes('api.neutron.paramount.tech')) {
@@ -243,6 +262,17 @@ async function handleProxy(req, res, targetHost, urlPrefixToRemove) {
     const originalXHR = window.XMLHttpRequest.prototype.open;
     window.XMLHttpRequest.prototype.open = function(method, url, ...args) {
       if (typeof url === 'string') {
+        if (isAdServer(url)) {
+          console.log('[Proxy AdBlocker] Blocked XHR to:', url);
+          // Override send to mock a successful empty load instantly
+          this.send = function() {
+            Object.defineProperty(this, 'readyState', { value: 4 });
+            Object.defineProperty(this, 'status', { value: 200 });
+            Object.defineProperty(this, 'responseText', { value: '' });
+            if (this.onload) this.onload();
+          };
+          return;
+        }
         if (url.includes('topaz.paramount.tech')) {
           url = url.replace(/https?:\\/\\/topaz\\.paramount\\.tech/g, window.location.origin + '/proxy-topaz');
         } else if (url.includes('api.neutron.paramount.tech')) {
@@ -268,6 +298,11 @@ async function handleProxy(req, res, targetHost, urlPrefixToRemove) {
       // 3. Neutron API links (metadata properties)
       bodyText = bodyText.replace(/https:(\/|\\\/|\\u002F){2}api\.neutron\.paramount\.tech/gi, '/proxy-neutron');
       bodyText = bodyText.replace(/http:(\/|\\\/|\\u002F){2}api\.neutron\.paramount\.tech/gi, '/proxy-neutron');
+
+      // 4. Disable ads in player configuration JSON
+      bodyText = bodyText.replace(/"googleAdSettings"\s*:\s*{\s*"enabled"\s*:\s*true/g, '"googleAdSettings":{"enabled":false');
+      bodyText = bodyText.replace(/"useAdPodTimer"\s*:\s*true/g, '"useAdPodTimer":false');
+      bodyText = bodyText.replace(/"forceSSAI"\s*:\s*true/g, '"forceSSAI":false');
       
       res.send(bodyText);
     } else {
